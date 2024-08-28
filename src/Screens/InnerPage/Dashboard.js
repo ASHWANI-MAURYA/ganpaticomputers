@@ -24,7 +24,7 @@ export default function Home() {
 
         <section className="bg-white p-6 rounded-lg shadow-lg mb-8">
           <h2 className="text-3xl font-semibold text-gray-800 mb-4">Welcome to GANPATI COMPUTERS</h2>
-          <p className="text-gray-600 mb-6">Manage your invoices, track payments, and view billing history.</p>
+          <p className="text-gray-600 mb-6">Manage your invoices, track payments, and view billing history..</p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <Link to="/totalInvoice" className="p-4 bg-blue-100 rounded-lg shadow-md">
