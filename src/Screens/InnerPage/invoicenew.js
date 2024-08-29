@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Header from '../../component/header';
 import Footer from '../../component/Footer';
 import Loader from '../../component/Loader';
+import { url } from '../../API/Config';
 const InvoiceForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -51,7 +52,7 @@ const InvoiceForm = () => {
           redirect: "follow"
         };
 
-        fetch("http://localhost:5000/api/product/allproducts", requestOptions)
+        fetch(url+`api/product/allproducts`, requestOptions)
           .then((response) => response.json())
           .then((result) => {
             console.log(result)
