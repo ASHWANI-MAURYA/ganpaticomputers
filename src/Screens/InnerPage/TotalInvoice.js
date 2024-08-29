@@ -7,7 +7,7 @@ const TotalInvoices = () => {
     <div className="bg-gray-100 min-h-screen flex flex-col">
       <Header />
 
-      <main className="container mx-auto flex-grow p-8">
+      <main className="container mx-auto flex-grow p-8 mt-14">
         <section className="bg-white p-6 rounded-lg shadow-lg">
           <h2 className="text-3xl font-semibold text-gray-800 mb-4">Total Invoices</h2>
           <p className="text-gray-600 mb-6">Here you can view all your invoices.</p>

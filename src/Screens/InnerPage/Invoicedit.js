@@ -4,9 +4,7 @@ import { AiOutlineCalendar, AiOutlineDollar } from 'react-icons/ai';
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from '../../component/header';
 import Footer from '../../component/Footer';
-import Loader from '../../component/Loader';
 const InvoiceForm = () => {
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [invoiceData, setInvoiceData] = useState({
     invoiceNumber: '',
@@ -20,14 +18,15 @@ const InvoiceForm = () => {
     },
     products: [
       {
-        productname: '',
+        description: '',
         Revrate: '',
         quantity: '',
+        unit: '',
         rate: '',
         GST: '',
         cgst: '',
         sgst: '',
-        amount: ''
+        amount: '',
       },
     ],
     totals: {
@@ -44,26 +43,12 @@ const InvoiceForm = () => {
   useEffect(() => {
     // Fetch product data from a dummy API or use a static array
     const fetchProductData = async () => {
-      setIsLoading(true)
-      try {
-        const requestOptions = {
-          method: "GET",
-          redirect: "follow"
-        };
-
-        fetch("http://localhost:5000/api/product/allproducts", requestOptions)
-          .then((response) => response.json())
-          .then((result) => {
-            console.log(result)
-            setProductOptions(result)
-            setIsLoading(false)
-          })
-
-          .catch((error) => console.error(error));
-      } catch (e) {
-        console.log(e.message)
-        setIsLoading(false)
-      }
+      const data = [
+        { id: 1, description: 'USB cable', Revrate: '1234', unit: 'PCS', rate: 100, GST: 18, amount: 100 },
+        { id: 2, description: 'Product 2', Revrate: '5678', unit: 'PCS', rate: 200, GST: 18, amount: 200 },
+        { id: 3, description: 'Product 3', Revrate: '9101', unit: 'PCS', rate: 300, GST: 18, amount: 300 },
+      ];
+      setProductOptions(data);
     };
 
     fetchProductData();
@@ -103,8 +88,9 @@ const InvoiceForm = () => {
     const newProducts = [...invoiceData.products];
     newProducts[index] = {
       ...newProducts[index],
-      productname: selectedProduct.productname,
+      description: selectedProduct.description,
       Revrate: selectedProduct.Revrate,
+      unit: selectedProduct.unit,
       rate: selectedProduct.rate,
       GST: selectedProduct.GST,
       amount: selectedProduct.amount,
@@ -118,9 +104,10 @@ const InvoiceForm = () => {
       products: [
         ...invoiceData.products,
         {
-          productname: '',
+          description: '',
           Revrate: '',
           quantity: '',
+          unit: '',
           rate: '',
           GST: '',
           cgst: '',
@@ -139,61 +126,22 @@ const InvoiceForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const updatedProducts = invoiceData.products.map(product => ({
-      ...product,
-      amount: (product.rate * product.quantity).toFixed(2),  // Ensure one decimal place
-    }));
-
-    // Calculate the total amount by summing all product amounts
-    const totalAmount = updatedProducts.reduce((total, product) => total + parseFloat(product.amount), 0);
-
-    // Calculate CGST and SGST amounts (9% each)
-    const cgstAmount = totalAmount * 0.09;
-    const sgstAmount = totalAmount * 0.09;
-
-    // Calculate the grand total before rounding off
-    const preRoundGrandTotal = totalAmount + cgstAmount + sgstAmount;
-
-    // Calculate the round-off amount to make the grand total a whole number
-    const roundOff = Math.ceil(preRoundGrandTotal) - preRoundGrandTotal;
-
-    // Calculate the final grand total by adding the round-off amount
-    const grandTotal = preRoundGrandTotal + roundOff;
-
-    // Update the invoice data with the calculated values
-    const updatedInvoiceData = {
-      ...invoiceData,
-      products: updatedProducts,
-      totals: {
-        taxableAmount: totalAmount.toFixed(2),
-        cgstAmount: cgstAmount.toFixed(2),
-        sgstAmount: sgstAmount.toFixed(2),
-        roundOff: roundOff.toFixed(2),
-        grandTotal: grandTotal.toFixed(2),
-        check: preRoundGrandTotal.toFixed(2),
-      },
-    };
-
-
-    navigate('/invoices', { state: { invoiceData: updatedInvoiceData } });
+    // console.log('Invoice Data:', invoiceData);
+    navigate('/invoices', { state: { invoiceData } });
   };
 
   return (
     <div className=" bg-gradient-to-b from-gray-50 to-gray-200 ">
       <Header />
-      <Loader
-        message={`Please Wait..`}
-        isLoading={isLoading}
-      />
       <div className='p-4 '>
-        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-xl overflow-hidden mt-14">
+        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-xl overflow-hidden min-h-screen mt-14">
           <div className="p-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
             <h1 className="text-lg font-bold flex items-center">
-              <FiFileText className="mr-2" /> Create Invoice
+              <FiFileText className="mr-2" /> Edit Invoice
             </h1>
           </div>
-          <form  className="p-6 space-y-6">
-          <div className="border p-4 rounded-lg shadow-md bg-white">
+          <form onSubmit={handleSubmit} className="p-6 space-y-6">
+            <div className="border p-4 rounded-lg shadow-md bg-white">
               <h2 className="text-2xl font-semibold mb-2">Buyer Information</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -204,8 +152,8 @@ const InvoiceForm = () => {
                     // type="number"
                     id="buyername"
                     name="buyername"
-                    // value={invoiceData.buyer.name}
-                    // onChange={handleInputChange}
+                    value={invoiceData.buyer.name}
+                    onChange={handleInputChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter name"
                   />
@@ -218,8 +166,8 @@ const InvoiceForm = () => {
                     // type="number"
                     id="buyeraddress"
                     name="buyeraddress"
-                    // value={invoiceData.buyer.address}
-                    // onChange={handleInputChange}
+                    value={invoiceData.buyer.address}
+                    onChange={handleInputChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter Address"
                   />
@@ -232,8 +180,8 @@ const InvoiceForm = () => {
                     // type="number"
                     id="buyergstin"
                     name="buyergstin"
-                    // value={invoiceData.buyer.gstin}
-                    // onChange={handleInputChange}
+                    value={invoiceData.buyer.gstin}
+                    onChange={handleInputChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter GST"
                   />
@@ -246,29 +194,27 @@ const InvoiceForm = () => {
                     // type="number"
                     id="buyercontact"
                     name="buyercontact"
-                    // value={invoiceData.buyer.contact}
-                    // onChange={handleInputChange}
+                    value={invoiceData.buyer.contact}
+                    onChange={handleInputChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter contact"
                   />
                 </div>
               </div>
             </div>
-          </form>
-          <form onSubmit={handleSubmit} className="p-6 space-y-6">
             <div className="border p-4 rounded-lg shadow-md bg-white">
               <h2 className="text-2xl font-semibold mb-4">Product Details</h2>
               {invoiceData.products.map((product, index) => (
                 <div key={index} className="grid grid-cols-1 md:grid-cols-6 gap-2 mb-3">
                   <div className="flex items-center border p-2 rounded-lg shadow-md bg-gray-50">
                     <select
-                      value={productOptions.find(p => p.productname === product.productname)?.id || ''}
+                      value={productOptions.find(p => p.description === product.description)?.id || ''}
                       onChange={(e) => handleProductSelect(index, e)}
                       className="w-full bg-transparent focus:outline-none text-sm"
                     >
                       <option value="" disabled>Select Product</option>
                       {productOptions.map((option) => (
-                        <option key={option.id} value={option.id}>{option.productname}</option>
+                        <option key={option.id} value={option.id}>{option.description}</option>
                       ))}
                     </select>
                   </div>
@@ -307,6 +253,7 @@ const InvoiceForm = () => {
                   <div className="flex items-center border p-2 rounded-lg shadow-md bg-gray-50">
                     <input
                       disabled
+                      type="number"
                       name="GST"
                       value={product.GST}
                       onChange={(e) => handleProductChange(index, e)}
@@ -339,7 +286,7 @@ const InvoiceForm = () => {
                 type="submit"
                 className="px-6 py-3 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 transition duration-200"
               >
-                Get Invoice
+                Edit Invoice
               </button>
             </div>
           </form>

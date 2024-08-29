@@ -1,2 +1,1 @@
-// export const url = 'https://apiskvt.charvns.com/webapi'
-// export const url = 'https://skvtnode.shrikashivishwanath.org/webapi'
+export const url = 'http://localhost:5000/'

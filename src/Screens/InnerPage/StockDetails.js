@@ -16,7 +16,7 @@ export default function StockDetails() {
       <Header />
 
       {/* Main Content */}
-      <main className="container mx-auto flex-grow p-8">
+      <main className="container mx-auto flex-grow p-8 mt-14">
         {/* Page Title */}
         <section className="bg-white p-6 rounded-lg shadow-lg mb-8">
           <h2 className="text-4xl font-bold text-gray-800 mb-4">Stock Details</h2>

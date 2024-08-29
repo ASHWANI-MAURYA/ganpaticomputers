@@ -20,11 +20,11 @@ const InvoicePrint = () => {
                         <p className="text-sm text-gray-600">NEAR NAU GJA PEER, MATA RANI ROAD, COLLEGE ROAD, ROPAR</p>
                         <p className="text-sm text-gray-600">RUPNAGAR (PUNJAB)</p>
                         <p className="text-sm text-gray-600">Phone: 9988893537</p>
-                        <p className="text-sm text-gray-600">E-Mail: <span className="text-indigo-600">testingemail.com</span></p>
+                        <p className="text-sm text-gray-600">E-Mail: <span className="text-indigo-600">Ganpati.computers1@gmail.com</span></p>
                     </div>
                     <div className="text-right">
                         <p className=" text-sm text-gray-800 font-medium">GSTIN: <span className="font-semibold text-sm">03BIKPK3166L1Z3</span></p>
-                        <p className="text-sm text-gray-800 font-medium">PAN: <span className="font-semibold text-sm">AAAHJ4130L</span></p>
+                        <p className="text-sm text-gray-800 font-medium">PAN: <span className="font-semibold text-sm">BIKPK3166L</span></p>
                     </div>
                 </div>
 
@@ -69,7 +69,6 @@ const InvoicePrint = () => {
                                 <th className=" border-b text-left text-sm">Description of Goods</th>
                                 {/* <th className=" border-b text-left text-sm">HSN/SAC</th> */}
                                 <th className=" border-b text-center text-sm">Qty.</th>
-                                <th className=" border-b text-center text-sm">Unit</th>
                                 <th className=" border-b text-right text-sm">Rate</th>
                                 <th className=" border-b text-right text-sm">Rev. Rate</th>
                                 <th className=" border-b text-center text-sm">GST (%)</th>
@@ -79,14 +78,13 @@ const InvoicePrint = () => {
                         <tbody className="bg-white">
                             {invoiceData.products.map((product, index) => (
                                 <tr key={index} className="hover:bg-gray-100 transition-colors">
-                                    <td className=" border-b text-left text-sm">{product.description}</td>
+                                    <td className=" border-b text-left text-sm">{product.productname}</td>
                                     {/* <td className=" border-b text-left text-sm">{product.hsnSac}</td> */}
                                     <td className=" border-b text-center text-sm">{product.quantity}</td>
-                                    <td className=" border-b text-center text-sm">{product.unit}</td>
                                     <td className=" border-b text-right text-sm">{product.rate}</td>
                                     <td className=" border-b text-right text-sm">{product.Revrate}</td>
                                     <td className=" border-b text-center text-sm">{product.GST} %</td>
-                                    <td className=" border-b text-right text-sm">₹{product.amount}</td>
+                                    <td className=" border-b text-right text-sm">{product.amount}</td>
                                 </tr>
                             ))}
                         </tbody>
@@ -103,23 +101,27 @@ const InvoicePrint = () => {
                             <div className="">
                                 <p className="flex justify-between">
                                     <span className="text-sm text-gray-800 font-bold">Total Amount:</span>
-                                    <span className="text-gray-800 text-sm">₹{invoiceData.totals.taxableAmount}</span>
+                                    <span className="text-gray-800 text-sm">{invoiceData.totals.taxableAmount}</span>
                                 </p>
                                 <p className="flex justify-between">
-                                    <span className="text-sm text-gray-800 font-bold">CGST Amount:</span>
-                                    <span className="text-gray-800 text-sm">₹{invoiceData.totals.cgstAmount}</span>
+                                    <span className="text-sm text-gray-800 font-bold">CGST @9.00%:</span>
+                                    <span className="text-gray-800 text-sm">{invoiceData.totals.cgstAmount}</span>
+                                </p>
+                                <p className="flex justify-between border-b-2">
+                                    <span className="text-sm text-gray-800 font-bold">SGST @9.00%:</span>
+                                    <span className="text-gray-800 text-sm">{invoiceData.totals.sgstAmount}</span>
                                 </p>
                                 <p className="flex justify-between">
-                                    <span className="text-sm text-gray-800 font-bold">SGST Amount:</span>
-                                    <span className="text-gray-800 text-sm">₹{invoiceData.totals.sgstAmount}</span>
+                                    <span className="text-sm text-gray-800 font-bold "></span>
+                                    <span className="text-gray-800 text-sm">{invoiceData.totals.check}</span>
                                 </p>
-                                <p className="flex justify-between">
+                                <p className="flex justify-between border-b-2">
                                     <span className="text-sm text-gray-800 font-bold">Round Off:</span>
-                                    <span className="text-gray-800 text-sm">₹{invoiceData.totals.roundOff}</span>
+                                    <span className="text-gray-800 text-sm">{invoiceData.totals.roundOff}</span>
                                 </p>
-                                <p className="flex justify-between font-bold text-lg text-gray-900">
+                                <p className="flex justify-between font-bold text-lg text-gray-900 border-b-2">
                                     <span className='text-sm'>Grand Total:</span>
-                                    <span className='text-sm'>₹{invoiceData.totals.grandTotal}</span>
+                                    <span className='text-sm'>₹ {invoiceData.totals.grandTotal}</span>
                                 </p>
                             </div>
                         </div>
@@ -131,9 +133,9 @@ const InvoicePrint = () => {
                 <div className="pl-4 pr-2">
                     <div className="mb-1">
                         <h3 className="text-sm font-semibold text-gray-900">Bank Details:</h3>
-                        <p className="text-sm text-gray-700">Bank: HDFC BANK LTD</p>
-                        <p className="text-sm text-gray-700">A/C: 50200052390607</p>
-                        <p className="text-sm text-gray-700">IFSC: HDFC0000046</p>
+                        <p className="text-sm text-gray-700">Bank: Punjab national bank</p>
+                        <p className="text-sm text-gray-700">A/C:  02671011000181</p>
+                        <p className="text-sm text-gray-700">IFSC: PUNB00408000</p>
                     </div>
                     <div className="mb-1">
                         <h3 className="text-sm text-sm font-semibold text-gray-900">Terms & Conditions:</h3>
@@ -146,7 +148,7 @@ const InvoicePrint = () => {
                     </div>
                     <div className="flex justify-between mt-6">
                         <p className="text-gray-700 font-semibold text-sm">Receiver's Signature</p>
-                        <p className="text-gray-700 font-semibold text-sm">For GANPATI COMPUTERS</p>
+                        <p className="text-gray-700 font-semibold text-sm">For Ganpati computers </p>
                     </div>
                 </div>
               <div className='flex justify-center mt-5 mb-5'>

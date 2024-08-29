@@ -5,20 +5,44 @@ import Header from '../../component/header'; // Adjust the import path as needed
 import Footer from '../../component/Footer';
 
 export default function Home() {
+  try {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    // const raw = JSON.stringify({
+    //   "password": "jkjk",
+    //   "email": "jkjk",
+    //   "name": "jkjkjk"
+    // });
+
+    const requestOptions = {
+      method: "GET",
+      headers: myHeaders,
+      // body: raw,
+      redirect: "follow"
+    };
+
+    fetch("https://ropartestingbackend-1.onrender.com/api/users/test", requestOptions)
+      .then((response) => response.json())
+      .then((result) => console.log(result))
+      .catch((error) => console.error(error));
+  } catch (e) {
+    console.log(e)
+  }
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">
       {/* Header */}
       <Header />
 
       {/* Main Content */}
-      <main className="container mx-auto flex-grow p-8">
+      <main className="container mx-auto flex-grow p-8 mt-14">
         {/* Buttons for Invoice and Stock */}
         <div className="mb-6 flex justify-end space-x-4">
           <Link to="/invoice/new" className="inline-block px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition duration-200">
             Create New Invoice
           </Link>
-          <Link to="/add-stock" className="inline-block px-6 py-3 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 transition duration-200">
-            Add Stock
+          <Link to="/invoice/edit" className="inline-block px-6 py-3 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 transition duration-200">
+            Edit Invoice
           </Link>
         </div>
 
@@ -58,14 +82,14 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="bg-white p-6 rounded-lg shadow-lg">
+        {/* <section className="bg-white p-6 rounded-lg shadow-lg">
           <h2 className="text-3xl font-semibold text-gray-800 mb-4">Recent Activity</h2>
           <ul className="text-gray-600">
             <li className="mb-2">Invoice #00123 marked as paid</li>
             <li className="mb-2">Invoice #00120 sent to customer</li>
             <li className="mb-2">Invoice #00118 overdue</li>
           </ul>
-        </section>
+        </section> */}
       </main>
 
       <Footer />

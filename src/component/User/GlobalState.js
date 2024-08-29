@@ -38,7 +38,7 @@ export const GlobalStateProvider = ({ children }) => {
   useEffect(() => {
     const loadState = async () => {
       try {
-        const savedState = await localforage.getItem('globalState');
+        const savedState = await localforage.getItem('localState');
         if (savedState) {
           // console.log('Loaded state from localforage:', savedState);
           dispatch({ type: 'LOAD_STATE', payload: savedState });
@@ -57,7 +57,7 @@ export const GlobalStateProvider = ({ children }) => {
   useEffect(() => {
     const saveState = async () => {
       try {
-        await localforage.setItem('globalState', state);
+        await localforage.setItem('localState', state);
         // console.log('State saved to localforage:', state);
       } catch (e) {
         console.error('Failed to save state to localforage:', e);
