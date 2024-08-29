@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { FiPlusCircle, FiFileText, FiUser, FiMapPin, FiPhone, FiPercent, FiTrash } from 'react-icons/fi';
-import { AiOutlineCalendar, AiOutlineDollar } from 'react-icons/ai';
-import { useLocation, useNavigate } from "react-router-dom";
+import { FiPlusCircle, FiFileText, FiTrash } from 'react-icons/fi';
+import { useNavigate } from "react-router-dom";
 import Header from '../../component/header';
 import Footer from '../../component/Footer';
 import Loader from '../../component/Loader';
 import { url } from '../../API/Config';
+
 const InvoiceForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -41,43 +41,40 @@ const InvoiceForm = () => {
   });
 
   const [productOptions, setProductOptions] = useState([]);
+  const [searchTerms, setSearchTerms] = useState(['']);
+  const [filteredOptions, setFilteredOptions] = useState([[]]);
 
   useEffect(() => {
-    // Fetch product data from a dummy API or use a static array
     const fetchProductData = async () => {
-      setIsLoading(true)
+      setIsLoading(true);
       try {
         const requestOptions = {
           method: "GET",
           redirect: "follow"
         };
 
-        fetch(url+`api/product/allproducts`, requestOptions)
+        fetch(url + `api/product/allproducts`, requestOptions)
           .then((response) => response.json())
           .then((result) => {
-            console.log(result)
-            setProductOptions(result)
-            setIsLoading(false)
+            setProductOptions(result);
+            setFilteredOptions(invoiceData.products.map(() => result));
+            setIsLoading(false);
           })
-
           .catch((error) => console.error(error));
       } catch (e) {
-        console.log(e.message)
-        setIsLoading(false)
+        console.log(e.message);
+        setIsLoading(false);
       }
     };
 
     fetchProductData();
 
-    // Set today's date as the default for the date of issue
     const today = new Date().toISOString().split('T')[0];
     setInvoiceData(prevData => ({ ...prevData, dateOfIssue: today }));
   }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
-    // Handle nested objects by checking for the presence of a dot (.)
     if (name.includes('.')) {
       const [parentKey, childKey] = name.split('.');
       setInvoiceData({
@@ -108,9 +105,22 @@ const InvoiceForm = () => {
       Revrate: selectedProduct.Revrate,
       rate: selectedProduct.rate,
       GST: selectedProduct.GST,
-      amount: selectedProduct.amount,
+      amount: (selectedProduct.rate * newProducts[index].quantity).toFixed(2),
     };
     setInvoiceData({ ...invoiceData, products: newProducts });
+  };
+
+  const handleSearchChange = (index, e) => {
+    const searchValue = e.target.value;
+    const newSearchTerms = [...searchTerms];
+    newSearchTerms[index] = searchValue;
+    setSearchTerms(newSearchTerms);
+
+    const newFilteredOptions = [...filteredOptions];
+    newFilteredOptions[index] = productOptions.filter(option =>
+      option.productname.toLowerCase().includes(searchValue.toLowerCase())
+    );
+    setFilteredOptions(newFilteredOptions);
   };
 
   const addProduct = () => {
@@ -130,38 +140,55 @@ const InvoiceForm = () => {
         },
       ],
     });
+    setSearchTerms([...searchTerms, '']);
+    setFilteredOptions([...filteredOptions, productOptions]);
   };
 
   const removeProduct = (index) => {
     const newProducts = [...invoiceData.products];
     newProducts.splice(index, 1);
     setInvoiceData({ ...invoiceData, products: newProducts });
-  };
 
+    const newSearchTerms = [...searchTerms];
+    newSearchTerms.splice(index, 1);
+    setSearchTerms(newSearchTerms);
+
+    const newFilteredOptions = [...filteredOptions];
+    newFilteredOptions.splice(index, 1);
+    setFilteredOptions(newFilteredOptions);
+  };
+  const calculateTotals = () => {
+    const updatedProducts = invoiceData.products.map(product => ({
+      ...product,
+      amount: (product.rate * product.quantity).toFixed(2),
+    }));
+
+    const totalAmount = updatedProducts.reduce((total, product) => total + parseFloat(product.amount), 0);
+    const cgstAmount = totalAmount * 0.09;
+    const sgstAmount = totalAmount * 0.09;
+    const preRoundGrandTotal = totalAmount + cgstAmount + sgstAmount;
+    const roundOff = Math.ceil(preRoundGrandTotal) - preRoundGrandTotal;
+    const grandTotal = preRoundGrandTotal + roundOff;
+
+    return {
+      grandTotal
+    };
+  };
   const handleSubmit = (e) => {
     e.preventDefault();
     const updatedProducts = invoiceData.products.map(product => ({
       ...product,
-      amount: (product.rate * product.quantity).toFixed(2),  // Ensure one decimal place
+      amount: (product.rate * product.quantity).toFixed(2),
     }));
 
-    // Calculate the total amount by summing all product amounts
     const totalAmount = updatedProducts.reduce((total, product) => total + parseFloat(product.amount), 0);
 
-    // Calculate CGST and SGST amounts (9% each)
     const cgstAmount = totalAmount * 0.09;
     const sgstAmount = totalAmount * 0.09;
-
-    // Calculate the grand total before rounding off
     const preRoundGrandTotal = totalAmount + cgstAmount + sgstAmount;
-
-    // Calculate the round-off amount to make the grand total a whole number
     const roundOff = Math.ceil(preRoundGrandTotal) - preRoundGrandTotal;
-
-    // Calculate the final grand total by adding the round-off amount
     const grandTotal = preRoundGrandTotal + roundOff;
 
-    // Update the invoice data with the calculated values
     const updatedInvoiceData = {
       ...invoiceData,
       products: updatedProducts,
@@ -171,14 +198,12 @@ const InvoiceForm = () => {
         sgstAmount: sgstAmount.toFixed(2),
         roundOff: roundOff.toFixed(2),
         grandTotal: grandTotal.toFixed(2),
-        check: preRoundGrandTotal.toFixed(2),
       },
     };
 
-
     navigate('/invoices', { state: { invoiceData: updatedInvoiceData } });
   };
-
+  const { grandTotal } = calculateTotals();
   return (
     <div className=" bg-gradient-to-b from-gray-50 to-gray-200 ">
       <Header />
@@ -193,62 +218,62 @@ const InvoiceForm = () => {
               <FiFileText className="mr-2" /> Create Invoice
             </h1>
           </div>
-          <form  className="p-6 space-y-6">
-          <div className="border p-4 rounded-lg shadow-md bg-white">
+          <form className="p-6 space-y-6">
+            <div className="border p-4 rounded-lg shadow-md bg-white">
               <h2 className="text-2xl font-semibold mb-2">Buyer Information</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="buyername">
+                  <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="buyer.name">
                     Name <span className='text-red-500'>*</span>
                   </label>
                   <input
-                    // type="number"
-                    id="buyername"
-                    name="buyername"
-                    // value={invoiceData.buyer.name}
-                    // onChange={handleInputChange}
+                    type="text"
+                    id="buyer.name"
+                    name="buyer.name"
+                    value={invoiceData.buyer.name}
+                    onChange={handleInputChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter name"
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="buyeraddress">
+                  <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="buyer.address">
                     Address <span className='text-red-500'>*</span>
                   </label>
                   <input
-                    // type="number"
-                    id="buyeraddress"
-                    name="buyeraddress"
-                    // value={invoiceData.buyer.address}
-                    // onChange={handleInputChange}
+                    type="text"
+                    id="buyer.address"
+                    name="buyer.address"
+                    value={invoiceData.buyer.address}
+                    onChange={handleInputChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter Address"
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="buyergstin">
+                  <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="buyer.gstin">
                     GST No. <span className='text-red-500'>*</span>
                   </label>
                   <input
-                    // type="number"
-                    id="buyergstin"
-                    name="buyergstin"
-                    // value={invoiceData.buyer.gstin}
-                    // onChange={handleInputChange}
+                    type="text"
+                    id="buyer.gstin"
+                    name="buyer.gstin"
+                    value={invoiceData.buyer.gstin}
+                    onChange={handleInputChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter GST"
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="buyercontact">
+                  <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="buyer.contact">
                     Contact <span className='text-red-500'>*</span>
                   </label>
                   <input
-                    // type="number"
-                    id="buyercontact"
-                    name="buyercontact"
-                    // value={invoiceData.buyer.contact}
-                    // onChange={handleInputChange}
+                    type="text"
+                    id="buyer.contact"
+                    name="buyer.contact"
+                    value={invoiceData.buyer.contact}
+                    onChange={handleInputChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter contact"
                   />
@@ -258,9 +283,27 @@ const InvoiceForm = () => {
           </form>
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             <div className="border p-4 rounded-lg shadow-md bg-white">
-              <h2 className="text-2xl font-semibold mb-4">Product Details</h2>
+              <h2 className="text-2xl font-semibold mb-2">Product Information</h2>
               {invoiceData.products.map((product, index) => (
-                <div key={index} className="grid grid-cols-1 md:grid-cols-6 gap-2 mb-3">
+                <div key={index} className="grid grid-cols-1 md:grid-cols-7 gap-2 mb-3">
+                  <div className="flex items-center border p-2 rounded-lg shadow-md bg-gray-50">
+                    <input
+                      type="text"
+                      placeholder="Search Product"
+                      value={searchTerms[index]}
+                      onChange={(e) => handleSearchChange(index, e)}
+                      className="w-full bg-transparent focus:outline-none text-sm"
+                      list={`suggestions-${index}`}
+                    />
+                    <datalist id={`suggestions-${index}`}>
+                      {filteredOptions[index]?.map((option) => (
+                        <option key={option.id} value={option.productname}>
+                          {option.productname}
+                        </option>
+                      ))}
+                    </datalist>
+                  </div>
+
                   <div className="flex items-center border p-2 rounded-lg shadow-md bg-gray-50">
                     <select
                       value={productOptions.find(p => p.productname === product.productname)?.id || ''}
@@ -268,7 +311,7 @@ const InvoiceForm = () => {
                       className="w-full bg-transparent focus:outline-none text-sm"
                     >
                       <option value="" disabled>Select Product</option>
-                      {productOptions.map((option) => (
+                      {filteredOptions[index]?.map((option) => (
                         <option key={option.id} value={option.id}>{option.productname}</option>
                       ))}
                     </select>
@@ -329,18 +372,18 @@ const InvoiceForm = () => {
               <button
                 type="button"
                 onClick={addProduct}
-                className="flex items-center mt-6 text-blue-600 hover:text-blue-800"
+                className="flex items-center text-blue-600 hover:text-blue-800"
               >
-                <FiPlusCircle className="mr-2" /> Add Product
+                <FiPlusCircle className="inline-block mr-1" /> Add Product
               </button>
             </div>
-
-            <div className="flex justify-end">
+            <div className="justify-between flex">
+              <span className="ml-4 font-bold">Total Payable Amount: ₹{grandTotal.toFixed(2)}</span>
               <button
                 type="submit"
-                className="px-6 py-3 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 transition duration-200"
+                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-800 focus:outline-none"
               >
-                Get Invoice
+                Save Invoice
               </button>
             </div>
           </form>
