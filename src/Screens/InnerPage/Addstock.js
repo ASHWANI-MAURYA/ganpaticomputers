@@ -13,7 +13,6 @@ const AddStock = () => {
     Revrate: '',
     quantity: '',
     rate: '',
-    GST: '',
     remark: ''
   });
   const handleChange = (e) => {
@@ -25,8 +24,7 @@ const AddStock = () => {
       formData.description == "" ||
       formData.Revrate == "" ||
       formData.quantity == "" ||
-      formData.rate == "" ||
-      formData.GST == "") {
+      formData.rate == "" ) {
       alert('all fields are required')
       return
     }
@@ -44,7 +42,6 @@ const AddStock = () => {
         "Revrate": formData.Revrate,
         "quantity": formData.quantity,
         "rate": formData.rate,
-        "GST": formData.GST,
         "remark": formData.remark
       });
 
@@ -70,10 +67,7 @@ const AddStock = () => {
             formData.Revrate = "";
             formData.quantity = "";
             formData.rate = "";
-            formData.GST = "";
             formData.remark = "";
-
-
           }
         })
         .catch((error) => console.error(error));
@@ -98,10 +92,10 @@ const AddStock = () => {
             </h1>
           </div>
           <div className="p-6 space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div>
                 <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="productname">
-                  Product Name <span className='text-red-500'>*</span>
+                  Brand Name <span className='text-red-500'>*</span>
                 </label>
                 <input
                   type="text"
@@ -115,7 +109,7 @@ const AddStock = () => {
               </div>
               <div>
                 <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="description">
-                  Description <span className='text-red-500'>*</span>
+                  Item Code <span className='text-red-500'>*</span>
                 </label>
                 <input
                   type="text"
@@ -156,7 +150,7 @@ const AddStock = () => {
                   placeholder="Enter rate"
                 />
               </div>
-              <div>
+              {/* <div>
                 <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="Revrate">
                   Rev. rate <span className='text-red-500'>*</span>
                 </label>
@@ -169,35 +163,7 @@ const AddStock = () => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter Revrate"
                 />
-              </div>
-              <div>
-                <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="GST">
-                  GST <span className='text-red-500'>*</span>
-                </label>
-                <input
-                  type="text"
-                  id="GST"
-                  name="GST"
-                  value={formData.GST}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter GST"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="remark">
-                  Remark
-                </label>
-                <input
-                  type="text"
-                  id="remark"
-                  name="remark"
-                  value={formData.remark}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter remark"
-                />
-              </div>
+              </div> */}
             </div>
             <div className="flex justify-end">
               <button

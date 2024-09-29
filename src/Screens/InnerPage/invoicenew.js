@@ -289,7 +289,7 @@ const InvoiceForm = () => {
                   <div className="flex items-center border p-2 rounded-lg shadow-md bg-gray-50">
                     <input
                       type="text"
-                      placeholder="Search Product"
+                      placeholder="Brand Name"
                       value={searchTerms[index]}
                       onChange={(e) => handleSearchChange(index, e)}
                       className="w-full bg-transparent focus:outline-none text-sm"
@@ -310,7 +310,7 @@ const InvoiceForm = () => {
                       onChange={(e) => handleProductSelect(index, e)}
                       className="w-full bg-transparent focus:outline-none text-sm"
                     >
-                      <option value="" disabled>Select Product</option>
+                      <option value="" disabled>Item Code</option>
                       {filteredOptions[index]?.map((option) => (
                         <option key={option.id} value={option.id}>{option.productname}</option>
                       ))}

@@ -7,8 +7,8 @@ import Loader from '../../component/Loader';
 export default function Welcome() {
   const { state, dispatch } = useGlobalState()
   const [isLoading, setIsLoading] = useState(false);
-  const [email, setemail] = useState('ahjhja');
-  const [password, setpassword] = useState('ghhgh');
+  const [email, setemail] = useState('');
+  const [password, setpassword] = useState('');
   const navigate = useNavigate(); // Hook for navigation
   const Login = () => {
     if (!email || email == "") {
